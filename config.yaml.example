@@ -1,0 +1,23 @@
+mode: dev
+
+secret_key: xxxxxxxx
+
+ali_access_key: xxxxxxxx
+ali_access_secret: xxxxxxxx
+
+doge_access: xxxxxxxx
+doge_secret: xxxxxxxx
+doge_file_cdnkey: xxxxxxxx
+
+email_host: xxxxxxxx
+email_port: xxxxxxxx
+email_host_user: xxxxxxxx
+email_host_password: xxxxxxxx
+email_use_tls: xxxxxxxx
+email_use_ssl: xxxxxxxx
+email_timeout: xxxxxxxx
+email_ssl_keyfile: xxxxxxxx
+email_ssl_certfile: xxxxxxxx
+
+openai_api_key: xxxxxxxx
+openai_base_url: xxxxxxxx

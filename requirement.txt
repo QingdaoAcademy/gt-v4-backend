@@ -1,0 +1,10 @@
+django~=5.2
+djangorestframework
+django-filter
+PyYAML
+alibabacloud_green20220302
+celery
+openai
+requests
+pycryptodome~=3.21.0
+psycopg2-binary
