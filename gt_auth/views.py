@@ -198,6 +198,7 @@ class UserViewset(ReadOnlyModelViewSet):
             mobile=yunxiao_data["mobile"],
             real_name=yunxiao_data['name'],
             school=school,
+            student_id=yunxiao_data['account'],
             identity=(yunxiao_data['roles'][0]["roleName"] if len(
                 yunxiao_data['roles']) > 0 else IdentityChoice.OTHER),
             quota=quota,
