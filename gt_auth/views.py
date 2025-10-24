@@ -43,6 +43,7 @@ from .serializers import (
     RoleSerializer,
     NotificationSerializer,
 )
+from .yunxiao import login as yunxiao_login
 from gt.permissions import Hccaptcha
 from gt.jwt import GtSignature
 from gt_coin.models import Coin, CoinRecordType
@@ -153,6 +154,88 @@ class UserViewset(ReadOnlyModelViewSet):
             return make_user_response(user, True, remember_me)
         else:
             raise AuthenticationFailed("用户名或密码错误")
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="register-with-yunxiao",
+        permission_classes=[Hccaptcha],
+    )
+    def register_with_yunxiao(self, request):
+        username = request.data.get("username").strip()
+        yunxiao_username = request.data.get("yunxiao_username").strip()
+        password = request.data.get("password").strip()
+        school = request.data.get("school")
+        invite_username = request.data.get("invite_username")
+        invite_user = None
+
+        if school not in [i.value for i in SchoolChoice]:
+            raise ValidationError("学校不存在")
+        if invite_username:
+            invite_user = User.objects.filter(username=invite_username).first()
+            if not invite_user:
+                raise ValidationError("邀请用户不存在")
+        if User.objects.filter(username=username).exists():
+            raise ValidationError("该用户名已被使用")
+
+        yunxiao_data = yunxiao_login(yunxiao_username, password, school)
+        if yunxiao_data["status"] != "success":
+            raise ValidationError(f"云校验证出错：{yunxiao_data['msg']}")
+
+        yunxiao_data = yunxiao_data["data"]
+        if User.objects.filter(student_id=yunxiao_data["account"],
+                               school=school).exists():
+            raise ValidationError("该云校账号已被其他用户绑定")
+
+        quota = Quota.objects.create()
+        permission = Permission.objects.create()
+        privacy = Privacy.objects.create()
+        coin = Coin.objects.create()
+
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            mobile=yunxiao_data["mobile"],
+            real_name=yunxiao_data['name'],
+            school=school,
+            identity=(yunxiao_data['roles'][0]["roleName"] if len(
+                yunxiao_data['roles']) > 0 else IdentityChoice.OTHER),
+            quota=quota,
+            permission=permission,
+            privacy=privacy,
+            coin=coin,
+        )
+        user.last_login = datetime.now(timezone.utc)
+        user.save()
+        role = Role.generate_default_role(user)
+
+        coin.add_record(
+            coin_amount.REGISTER,
+            CoinRecordType.REGISTER,
+            detail=f"注册奖励",
+        )
+        if invite_user:
+            coin.add_record(
+                coin_amount.INVITE_BY,
+                CoinRecordType.INVITE,
+                detail=f"邀请用户ID={invite_user.id}",
+            )
+            invite_user.coin.add_record(
+                coin_amount.INVITE,
+                CoinRecordType.INVITE,
+                detail=f"注册用户ID={user.id}",
+            )
+
+        # try:
+        #     role_name = chatgpt_get_response(
+        #         f"我叫{user.real_name}，性别{user.gender}，请为我生成论坛用户名。用户名应为4或5个字，好听、有诗意，不泄露姓名，使用名字中姓氏之外的一个字，具有一定本意，可以使用拆字、谐音梗的方式，符合青少年。仅输出生成的一个用户名"
+        #     )
+        #     role.name = role_name
+        #     role.save()
+        # except Exception as e:
+        #     print("生成角色名失败", e)
+
+        return make_user_response(user, login=True, remember_me=False)
 
     @action(
         detail=False,
