@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework import exceptions
 
 
-INCLUDED_KEYS = ["user_id", "user_version", "exp", "source", "from_school"]
+INCLUDED_KEYS = ["user_id", "user_version", "exp", "source"]
 REQUIRED_KEYS = ["exp"]
 SECRET_KEY = settings.SECRET_KEY
 

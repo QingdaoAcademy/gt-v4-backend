@@ -10,7 +10,6 @@ class JWTAuthentication(authentication.BaseAuthentication):
         if not auth_header:
             setattr(request, "role", None)
             setattr(request, "source", "web")
-            setattr(request, "from_school", False)
             setattr(request, "is_server", False)
             return None
 
@@ -31,11 +30,6 @@ class JWTAuthentication(authentication.BaseAuthentication):
             if source and source not in [choice[0] for choice in SourceChoice.choices]:
                 raise exceptions.AuthenticationFailed("非法来源")
             setattr(request, "source", source)
-
-            from_school = payload.get(
-                "from_school", getattr(request, "from_school", False)
-            )
-            setattr(request, "from_school", from_school)
 
             is_server = payload.get("is_server", getattr(request, "is_server", False))
             setattr(request, "is_server", is_server)

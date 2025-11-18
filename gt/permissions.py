@@ -52,16 +52,6 @@ class HaveRoleOrReadOnly(permissions.BasePermission):
         return request.role is not None
 
 
-class IsAuthenticatedOrFromSchoolElseRead(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        if request.method in ["GET", "HEAD", "OPTIONS"]:
-            return True
-        if request.user and request.user.is_authenticated:
-            return True
-        return request.from_school
-
-
 def HasPermission(permission: str):
 
     class _HasPermission(permissions.BasePermission):

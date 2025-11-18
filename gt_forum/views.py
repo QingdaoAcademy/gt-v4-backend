@@ -110,8 +110,6 @@ class PostViewset(ModelViewSet):
             share_with_min = PostShareWithChoice.SCHOOL
             if user.identity == IdentityChoice.STUDENT:
                 share_with_min = PostShareWithChoice.STUDENT
-        elif self.request.from_school:
-            share_with_min = PostShareWithChoice.SCHOOL
 
         review_status_min = ReviewStatusChoice.NO_NEED
 
@@ -369,8 +367,6 @@ class CommentViewset(ModelViewSet):
             share_with_min = PostShareWithChoice.SCHOOL
             if user.identity == IdentityChoice.STUDENT:
                 share_with_min = PostShareWithChoice.STUDENT
-        elif self.request.from_school:
-            share_with_min = PostShareWithChoice.SCHOOL
 
         review_status_min = ReviewStatusChoice.NO_NEED
 
