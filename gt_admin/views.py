@@ -156,7 +156,7 @@ class RoleAdminViewset(
 
 
 class PostAdminViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
-    permission_classes = [IsAuthenticated(), HasPermissionOrReadOnly("admin_forum")]
+    permission_classes = [IsAuthenticated, HasPermissionOrReadOnly("admin_forum")]
     search_fields = ["id", "title", "content"]
 
     def get_queryset(self):
