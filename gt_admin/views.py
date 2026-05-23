@@ -156,9 +156,15 @@ class RoleAdminViewset(
 
 
 class PostAdminViewset(GenericViewSet, ListModelMixin, RetrieveModelMixin):
-    queryset = Post.objects.order_by("-id")
-    permission_classes = [HasPermissionOrReadOnly("admin_forum")]
+    permission_classes = [IsAuthenticated(), HasPermissionOrReadOnly("admin_forum")]
     search_fields = ["id", "title", "content"]
+
+    def get_queryset(self):
+        queryset = Post.objects.order_by("-id")
+        user = self.request.user
+        if not user.permission.admin_forum:
+            queryset = queryset.filter(author=self.request.role)
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":

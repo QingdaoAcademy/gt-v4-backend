@@ -129,7 +129,7 @@ class PostViewset(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         post = self.get_object()
-        if self.request.GET.get("for") == "edit":
+        if self.request.GET.get("for") == "edit" and post.author_id == request.role.id:
             post_version = PostVersion.objects.get(
                 post=post, version=post.latest_version
             )
